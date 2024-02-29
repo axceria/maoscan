@@ -7,14 +7,14 @@ import (
 	"sync"
 )
 
-type Exporter struct {
+type exporter struct {
 	f         *os.File
 	out       string
 	proxyType  int
 	mu        sync.Mutex
 }
 
-func (e *Exporter) create() error {
+func (e *exporter) create() error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -27,7 +27,7 @@ func (e *Exporter) create() error {
 	case 3:
 		filename = "socks5.txt"
 	default:
-		return fmt.Errorf("invalid proxy type: %d", e.proxyType)
+		return fmt.Errorf("invalid proxy type: %d", strconv.Itoa(e.proxyType))
 	}
 
 	var err error
@@ -38,7 +38,7 @@ func (e *Exporter) create() error {
 	return nil
 }
 
-func (e *Exporter) Close() {
+func (e *exporter) Close() {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
@@ -48,7 +48,7 @@ func (e *Exporter) Close() {
 	}
 }
 
-func (e *Exporter) Add(s string) {
+func (e *exporter) Add(s string) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
