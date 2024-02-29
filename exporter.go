@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"sync"
@@ -17,8 +18,20 @@ func (e *Exporter) create() error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
 
+	var filename string
+	switch e.proxyType {
+	case 1:
+		filename = "http.txt"
+	case 2:
+		filename = "socks4.txt"
+	case 3:
+		filename = "socks5.txt"
+	default:
+		return fmt.Errorf("invalid proxy type: %d", e.proxyType)
+	}
+
 	var err error
-	e.f, err = os.OpenFile(e.out, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
+	e.f, err = os.OpenFile(filename, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0666)
 	if err != nil {
 		return err
 	}
