@@ -1,7 +1,3 @@
-/*
-   (c) Yariya
-*/
-
 package main
 
 import (
