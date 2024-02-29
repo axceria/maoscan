@@ -137,7 +137,7 @@ func (p *Proxy) CheckProxyHTTP(proxy string) {
 		atomic.AddUint64(&statusCodeErr, 1)
 	} else if res.StatusCode == 200 {		
 		atomic.AddUint64(&success, 1)
-		exporter.Add(fmt.Sprintf("%s:%d", s[0], proxyPort))
+		exporter.Add(fmt.Sprintf(1,"%s:%d", s[0], proxyPort))
 		if config.PrintIps.Enabled {
 			go PrintProxy(s[0], proxyPort)
 		}
@@ -153,7 +153,7 @@ func (p *Proxy) CheckProxyHTTP(proxy string) {
 			} else {
 				if strings.Contains(string(body), "html") {
 					atomic.AddUint64(&success, 1)
-					exporter.Add(fmt.Sprintf("%s:%d", s[0], proxyPort))
+					exporter.Add(fmt.Sprintf(1,"%s:%d", s[0], proxyPort))
 					if config.PrintIps.Enabled {
 						go PrintProxy(s[0], proxyPort)
 					}
@@ -220,7 +220,7 @@ func (p *Proxy) CheckProxySocks4(proxy string) {
 			go PrintProxy(s[0], proxyPort)
 		}
 		atomic.AddUint64(&success, 1)
-		exporter.Add(fmt.Sprintf("%s:%d", s[0], proxyPort))
+		exporter.Add(fmt.Sprintf(2,"%s:%d", s[0], proxyPort))
 	}
 }
 
@@ -277,7 +277,7 @@ func (p *Proxy) CheckProxySocks5(proxy string) {
 			go PrintProxy(s[0], proxyPort)
 		}
 		atomic.AddUint64(&success, 1)
-		exporter.Add(fmt.Sprintf("%s:%d", s[0], proxyPort))
+		exporter.Add(fmt.Sprintf(3,"%s:%d", s[0], proxyPort))
 	}
 }
 
