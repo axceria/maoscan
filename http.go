@@ -51,6 +51,8 @@ func (p *Proxy) WorkerThread() {
 					go p.CheckProxySocks4(proxy)
 				} else if strings.ToLower(config.ProxyType) == "socks5" {
 					go p.CheckProxySocks5(proxy)
+				} else if strings.ToLower(config.ProxyType) == "all" {
+					go p.CheckProxyH
 				} else {
 					log.Fatalln("invalid ProxyType")
 				}
@@ -114,8 +116,10 @@ func (p *Proxy) CheckProxyHTTP(proxy string) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	req.Header.Add("User-Agent", config.Headers.UserAgent)
+	req.Header.Add("user-agent", config.Headers.UserAgent)
 	req.Header.Add("accept", config.Headers.Accept)
+	req.Header.Add("accept-encoding","gzip, deflate, br")
+	req.Header.Add("accept-language","en-US,en;q=0.9")
 
 	res, err := client.Do(req)
 	if err != nil {
@@ -169,8 +173,10 @@ func (p *Proxy) CheckProxySocks4(proxy string) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	req.Header.Add("User-Agent", config.Headers.UserAgent)
+	req.Header.Add("user-agent", config.Headers.UserAgent)
 	req.Header.Add("accept", config.Headers.Accept)
+	req.Header.Add("accept-encoding","gzip, deflate, br")
+	req.Header.Add("accept-language","en-US,en;q=0.9")
 
 	res, err := client.Do(req)
 	if err != nil {
@@ -224,8 +230,10 @@ func (p *Proxy) CheckProxySocks5(proxy string) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	req.Header.Add("User-Agent", config.Headers.UserAgent)
+	req.Header.Add("user-agent", config.Headers.UserAgent)
 	req.Header.Add("accept", config.Headers.Accept)
+	req.Header.Add("accept-encoding","gzip, deflate, br")
+	req.Header.Add("accept-language","en-US,en;q=0.9")
 
 	res, err := client.Do(req)
 	if err != nil {
@@ -246,4 +254,34 @@ func (p *Proxy) CheckProxySocks5(proxy string) {
 		atomic.AddUint64(&success, 1)
 		exporter.Add(fmt.Sprintf("%s:%d", s[0], proxyPort))
 	}
+}
+
+func (p *Proxy) CheckAllProxyType(proxy string) {
+	numworkers := 3
+	tasks := make(chan func(), numworkers)
+	var wg sync.WaitGroup
+
+	// start workers
+	for i := 0; i < numworkers; i++ {
+		go func() {
+			for task := range tasks {
+				task()
+				wg.Done()
+			}
+		}()
+	}
+
+	wg.Add(numworkers)
+	tasks <- func() {
+		p.CheckProxyHTTP(proxy)
+	}
+	tasks <- func() {
+		p.CheckProxySocks4(proxy)
+	}
+	tasks <- func() {
+		p.CheckProxySocks5(proxy)
+	}
+
+	wg.wait()
+	close(tasks)
 }
