@@ -53,7 +53,7 @@ var config Config
 
 func main() {
 	if strings.Contains(strings.Join(os.Args[0:], ""), "-h") {
-		fmt.Printf("\t\tZmap ProxyScanner @tcpfin\nHelp:\n\t-p <port> - Port you want to scan.\n\t-o <proxies.txt> - Writes proxy hits to file.\n\n\t-input <proxies.txt> - Loads the proxy list and checks it.\n\t-url https://api.com/proxies - Loads the proxies from an api and checks it.\n\n\tconfig.json - Customize the whole proxy checker\n")
+		fmt.Printf("\t\tMeow! http|socks4|socks5 scanner. \nUsage:\n\t-p <port> - Port you want to scan.\n\t-o <proxies.txt> - Writes proxy hits to file.\n\n\t-input <proxies.txt> - Loads the proxy list and checks it.\n\t-url https://api.com/proxies - Loads the proxies from an api and checks it.\n\n\tconfig.json - Customize the whole proxy checker\n")
 		return
 	}
 	flag.Parse()
