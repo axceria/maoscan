@@ -1,7 +1,3 @@
-/*
-	(c) Yariya
-*/
-
 package main
 
 import (
@@ -147,7 +143,7 @@ func (p *Proxy) CheckProxyHTTP(proxy string) {
 
 			// do not read all, or die
 			limitReader := io.LimitReader(res.Body, 4096)
-			body, err != ioutil.ReadAll(limitReader)
+			body, err := ioutil.ReadAll(limitReader)
 			if err != nil {
 				atomic.AddUint64(&statusCodeErr, 1)
 			} else {
