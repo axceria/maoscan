@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"h12.io/socks"
 	"log"
+	"io"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
@@ -138,7 +140,7 @@ func (p *Proxy) CheckProxyHTTP(proxy string) {
 			go PrintProxy(s[0], proxyPort)
 		}
 	} else {
-		if res.body != nil {
+		if res.Body != nil {
 			defer res.Body.Close()
 
 			// do not read all, or die
