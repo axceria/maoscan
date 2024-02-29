@@ -52,9 +52,9 @@ func (p *Proxy) WorkerThread() {
 				} else if strings.ToLower(config.ProxyType) == "socks5" {
 					go p.CheckProxySocks5(proxy)
 				} else if strings.ToLower(config.ProxyType) == "all" {
-					go p.CheckProxyH
+					go p.CheckAllProxyType(proxy)
 				} else {
-					log.Fatalln("invalid ProxyType")
+					log.Fatalln("Supported proxy types: http|socks4|socks5|all")
 				}
 				delete(p.ips, proxy)
 				break
@@ -131,14 +131,39 @@ func (p *Proxy) CheckProxyHTTP(proxy string) {
 		return
 	}
 	res.Body.Close()
-	if res.StatusCode != 200 {
+
+	if res.StatusCode == 407 {
+		// dropped due to authentication
 		atomic.AddUint64(&statusCodeErr, 1)
-	} else {
+	} else if res.StatusCode == 200 {		
+		atomic.AddUint64(&success, 1)
+		exporter.Add(fmt.Sprintf("%s:%d", s[0], proxyPort))
 		if config.PrintIps.Enabled {
 			go PrintProxy(s[0], proxyPort)
 		}
-		atomic.AddUint64(&success, 1)
-		exporter.Add(fmt.Sprintf("%s:%d", s[0], proxyPort))
+	} else {
+		if res.body != nil {
+			defer res.Body.Close()
+
+			// do not read all, or die
+			limitReader := io.LimitReader(res.Body, 4096)
+			body, err != ioutil.ReadAll(limitReader)
+			if err != nil {
+				atomic.AddUint64(&statusCodeErr, 1)
+			} else {
+				if strings.Contains(string(body), "html") {
+					atomic.AddUint64(&success, 1)
+					exporter.Add(fmt.Sprintf("%s:%d", s[0], proxyPort))
+					if config.PrintIps.Enabled {
+						go PrintProxy(s[0], proxyPort)
+					}
+				} else {
+					atomic.AddUint64(&statusCodeErr, 1)
+				}
+			}
+		} else {
+			atomic.AddUint64(&statusCodeErr, 1)
+		}
 	}
 }
 
